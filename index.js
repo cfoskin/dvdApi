@@ -81,3 +81,36 @@ dvdRoute.get(function(req, res) {
         res.json(dvd);
     });
 });
+
+
+// Create endpoint /api/dvds/:dvd_id for PUT
+dvdRoute.put(function(req, res) {
+    // Use the Dvd model to find a specific dvd
+    Dvd.findById(req.params.dvd_id, function(err, dvd) {
+        if (err)
+            res.send(err);
+
+        // Update the existing dvd quantity
+        dvd.quantity = req.body.quantity;
+
+        // Save the dvd and check for errors
+        dvd.save(function(err) {
+            if (err)
+                res.send(err);
+
+            res.json(dvd);
+        });
+    });
+});
+
+
+// Create endpoint /api/dvds/:dvd_id for DELETE
+dvdRoute.delete(function(req, res) {
+  // Use the Dvd model to find a specific dvd and remove it
+  Dvd.findByIdAndRemove(req.params.dvd_id, function(err) {
+    if (err)
+      res.send(err);
+
+    res.json({ message: 'All the copies of thid dvd are now gone from the dvd store!' });
+  });
+});
