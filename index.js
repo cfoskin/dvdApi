@@ -60,7 +60,7 @@ dvdsRoute.post(function(req, res) {
 
 // Create endpoint /api/dvds for GET
 dvdsRoute.get(function(req, res) {
-    // Use the Beer model to find all beer
+    // Use the Dvd model to find all dvd
     Dvd.find(function(err, dvds) {
         if (err)
             res.send(err);
@@ -70,7 +70,7 @@ dvdsRoute.get(function(req, res) {
 });
 
 // Create a new route with the /dvds/:dvd_id prefix
-var dvdRoute = router.route('/beers/:beer_id');
+var dvdRoute = router.route('/dvds/:dvd_id');
 
 // Create endpoint /api/dvds/:dvd_id for GET
 dvdRoute.get(function(req, res) {
@@ -78,6 +78,6 @@ dvdRoute.get(function(req, res) {
     Dvd.findById(req.params.dvd_id, function(err, dvd) {
         if (err)
             res.send(err);
-        res.json(beer);
+        res.json(dvd);
     });
 });
