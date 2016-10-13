@@ -3,21 +3,31 @@ var express = require('express');
 var bodyParser = require('body-parser');
 
 var passport = require('passport');
-var authController = require('./controllers/authentication');
 //database
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:/dvdStoreDb');
 
 //controllers
 var dvdController = require('./controllers/dvd');
-var customerController = require('./controllers/customer');
+var userController = require('./controllers/user');
+var oauth2Controller = require('./controllers/oauth2');
+var authController = require('./controllers/auth');
+var clientController = require('./controllers/client');
 
+var session = require('express-session');
+var ejs = require('ejs');
 var app = express();
-// Use the body-parser package in our application
-app.use(bodyParser.json());
+app.set('view engine', 'ejs');
 
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
+}));
+
+app.use(session({
+  secret: 'Super Secret Session Key',
+  saveUninitialized: true,
+  resave: true
 }));
 
 app.use(passport.initialize());
@@ -41,15 +51,26 @@ router.route('/dvds/:dvd_id')
   .put(authController.isAuthenticated, dvdController.putDvd)
   .delete(authController.isAuthenticated, dvdController.deleteDvd);
 
-router.route('/customers')
-  .post(customerController.postCustomers)
-  .get( customerController.getCustomers);
+router.route('/users')
+  .post(userController.postUsers)
+  .get(authController.isAuthenticated, userController.getUsers);
 
-router.route('/customers/:cust_id')
-  .get(authController.isAuthenticated, customerController.getCustomer)
-  .put(authController.isAuthenticated, customerController.putCustomer)
-  .delete(authController.isAuthenticated, customerController.deleteCustomer);
+router.route('/users/:user_id')
+  .get(authController.isAuthenticated, userController.getUser)
+  .put(authController.isAuthenticated, userController.putUser)
+  .delete(authController.isAuthenticated, userController.deleteUser);
+  
+router.route('/clients')
+  .post(authController.isAuthenticated, clientController.postClients)
+  .get(authController.isAuthenticated, clientController.getClients);
 
+router.route('/oauth2/authorize')
+  .get(authController.isAuthenticated, oauth2Controller.authorization)
+  .post(authController.isAuthenticated, oauth2Controller.decision);
+
+// Create endpoint handlers for oauth2 token
+router.route('/oauth2/token')
+  .post(authController.isClientAuthenticated, oauth2Controller.token);
 // Register all our routes with /api
 app.use('/api', router);
 app.listen(port);
