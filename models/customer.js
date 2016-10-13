@@ -18,7 +18,6 @@ var CustomerSchema = new mongoose.Schema({
   }
 });
 
-// Execute before each customer.save() call
 CustomerSchema.pre('save', function(callback) {
   var customer = this;
   // Break out if the password hasn't changed
@@ -33,5 +32,13 @@ CustomerSchema.pre('save', function(callback) {
     });
   });
 });
+
+
+CustomerSchema.methods.verifyPassword = function(password, cb) {
+  bcrypt.compare(password, this.password, function(err, isMatch) {
+    if (err) return cb(err);
+    cb(null, isMatch);
+  });
+};
 
 module.exports = mongoose.model('customer', CustomerSchema);

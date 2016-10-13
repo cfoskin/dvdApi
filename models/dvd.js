@@ -5,7 +5,7 @@ var DvdSchema   = new mongoose.Schema({
   name: String,
   genre: String,
   certification: String,
-  quantity: Number
+  customerId: String
 });
 
 // Export the Mongoose model

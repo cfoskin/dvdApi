@@ -1,9 +1,11 @@
 // Get the packages we need
 var express = require('express');
 var bodyParser = require('body-parser');
+
+var passport = require('passport');
+var authController = require('./controllers/authentication');
 //database
 var mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost:/dvdStoreDb');
 
 //controllers
@@ -12,9 +14,13 @@ var customerController = require('./controllers/customer');
 
 var app = express();
 // Use the body-parser package in our application
+app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+app.use(passport.initialize());
 
 // Use environment defined port or 3000
 var port = process.env.PORT || 3000;
@@ -27,22 +33,22 @@ router.get('/', function(req, res) {
 });
 
 router.route('/dvds')
-  .post(dvdController.postDvds)
-  .get(dvdController.getDvds);
+  .post(authController.isAuthenticated, dvdController.postDvds)
+  .get(authController.isAuthenticated, dvdController.getDvds);
 
 router.route('/dvds/:dvd_id')
-  .get(dvdController.getDvd)
-  .put(dvdController.putDvd)
-  .delete(dvdController.deleteDvd);
+  .get(authController.isAuthenticated, dvdController.getDvd)
+  .put(authController.isAuthenticated, dvdController.putDvd)
+  .delete(authController.isAuthenticated, dvdController.deleteDvd);
 
 router.route('/customers')
   .post(customerController.postCustomers)
-  .get(customerController.getCustomers);
+  .get( customerController.getCustomers);
 
 router.route('/customers/:cust_id')
-  .get(customerController.getCustomer)
-  .put(customerController.putCustomer)
-  .delete(customerController.deleteCustomer);
+  .get(authController.isAuthenticated, customerController.getCustomer)
+  .put(authController.isAuthenticated, customerController.putCustomer)
+  .delete(authController.isAuthenticated, customerController.deleteCustomer);
 
 // Register all our routes with /api
 app.use('/api', router);

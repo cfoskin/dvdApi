@@ -9,7 +9,7 @@ exports.postCustomers = function(req, res) {
   customer.save(function(err) {
     if (err)
       res.send(err);
-    res.json({ message: 'New customer has Joined the dvd store!' });
+    res.json({ message: 'New customer been created!' });
   });
 };
 
@@ -31,8 +31,6 @@ exports.getCustomers = function(req, res) {
     res.json(customers);
   });
 };
-
-
 
 // Create endpoint /api/customers/:cust_id for PUT
 exports.putCustomer = function(req, res) {
